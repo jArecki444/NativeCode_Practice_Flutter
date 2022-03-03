@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 void main() {
   runApp(const MyApp());
@@ -30,7 +31,20 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int batteryLevel = 0;
+  int? batteryLevel = 0;
+
+  Future<void> getBatteryLevel() async {
+    int? deviceBatteryLevel;
+    try {
+      const platform = MethodChannel('native.code.practice/battery');
+      deviceBatteryLevel = await platform.invokeMethod('getBatteryLevel');
+    } catch (e) {
+      deviceBatteryLevel = null;
+    }
+    setState(() {
+      batteryLevel = deviceBatteryLevel;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,6 +62,10 @@ class _MyHomePageState extends State<MyHomePage> {
             Text(
               '$batteryLevel',
               style: Theme.of(context).textTheme.headline4,
+            ),
+            ElevatedButton(
+              child: const Text('Get Battery Level'),
+              onPressed: getBatteryLevel,
             ),
           ],
         ),
